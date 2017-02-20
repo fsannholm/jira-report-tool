@@ -8,13 +8,13 @@ function getAssignedTaskSummary (state) {
     let name, key, estimate;
     let fields = issue.fields;
     if(fields.assignee){
-      name = fields.assignee.name;
+      name = fields.assignee.displayName;
       key = fields.assignee.key;
     } else {
       name = 'Unassigned';
       key = 'unassigned';
     }
-    estimate = fields.timeestimate || 0;
+    estimate = fields.timeoriginalestimate || 0;
     return { name: name, key: key, timeestimate: estimate};
   });
 
