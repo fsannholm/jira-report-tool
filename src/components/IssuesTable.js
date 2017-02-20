@@ -1,4 +1,6 @@
 import React, { Component } from 'react';
+import {connect} from 'react-redux';
+import {openSubtasks} from '../actions/issues';
 import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColumn} from 'material-ui/Table';
 import Checkbox from 'material-ui/Checkbox';
 import moment from 'moment';
@@ -62,10 +64,14 @@ class IssuesTable extends Component {
 		}
 	}
 
-	issueRow () {
-		return this.props.issues.map((issue) => {
+	showSubtasks(rowIndex){
+		let issueId = this.props.issues[rowIndex].id;
+		this.props.openSubtasks(issueId);
+	}
+
+	issueRow (issue) {
 		let fields = issue.fields;
-		return (<TableRow key={issue.key}>
+		return (<TableRow key={issue.key} >
 			<TableRowColumn>{fields.issuetype.name}</TableRowColumn>
 			<TableRowColumn>{issue.key}</TableRowColumn>
 			<TableRowColumn>{fields.summary}</TableRowColumn>
@@ -76,17 +82,18 @@ class IssuesTable extends Component {
 			<TableRowColumn>{this.getTimeEstimate(fields.timeoriginalestimate)}</TableRowColumn>
 			<TableRowColumn>{this.getRemainingEstimate(fields.timespent)}</TableRowColumn>
 		</TableRow>)
-		})
 	}
 
 	render(){
 		let rows;
 		if(this.state.visible){
-			 rows = this.issueRow()
+			 rows = this.props.issues.map( (issue) =>{
+				return this.issueRow(issue);
+			 })
 		}
 		return(
 			<div>
-				<Table showCheckboxes={false} >
+				<Table showCheckboxes={false} onCellClick={(rowIndex) => this.showSubtasks(rowIndex)}>
 					<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
 						<TableRow>
 							<TableHeaderColumn>
@@ -123,5 +130,18 @@ class IssuesTable extends Component {
 			</div>
 	)}
 }
+
+const mapDispatchToProps = (dispatch) => {
+	return {
+		openSubtasks(taskId){
+			dispatch(openSubtasks(taskId));
+		}
+	}
+}
+
+IssuesTable = connect(
+	null,
+	mapDispatchToProps
+)(IssuesTable);
 
 export default IssuesTable

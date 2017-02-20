@@ -1,10 +1,13 @@
 import { combineReducers } from 'redux';
 import issues from '../../mocks/issues.json';
+import cloneDeep from 'lodash.clonedeep'; 
 
 const initialState = issues;
 
-function getAssignedTaskSummary (state) {
-  let summary = state.issues.map((issue) => {
+const initialSummaryState = {assignedSummary: []}
+
+function getAssignedTaskSummary () {
+  let summary = initialState.issues.map((issue) => {
     let name, key, estimate;
     let fields = issue.fields;
     if(fields.assignee){
@@ -36,17 +39,55 @@ function getAssignedTaskSummary (state) {
   return summaryFilter;
 }
 
+function getSubTasks(state){
+  return state.issues.filter(issue => {
+    return issue.fields.issuetype.subtask
+  });
+}
+
+function getTopLevelTasks(state){
+  return state.issues.filter(issue => {
+    return !issue.fields.issuetype.subtask
+  });
+}
+
+function arrangeSubtasks(state){
+  let topLevel = getTopLevelTasks(state);
+  let subtasks = getSubTasks(state);
+  let rtn = topLevel.map((task,index)=>{
+    let newTask = cloneDeep(task);
+    newTask.showSubtasks = false;
+    newTask.subtasks = subtasks.filter( (st) => {
+      return st.fields.parent.id === task.id;
+    })
+    return newTask;
+  })
+  return rtn;
+}
+
+function setSubtasksVisible(state, id){
+  console.log(state);
+}
+
 function tickets(state = initialState, action){
   switch(action.type){
+    case 'SHOW_SUBTASKS':
+      setSubtasksVisible(state, action.id);
+      console.log(state);
+      return {...state, state};
     default:
-      return state
+      return {issues: getTopLevelTasks(state), subtasks: getSubTasks(state), sorted: arrangeSubtasks(state)}
   }
 }
 
-function summary(state = initialState, action){
+function summary(state = initialSummaryState, action){
   switch (action.type){
-    default: 
-      return getAssignedTaskSummary(state);
+    case 'GET_ASSIGNED_SUMMARY':
+      console.log('GET_ASSIGNED_SUMMARY')
+      console.log(state)
+      return {...state, assignedSummary: getAssignedTaskSummary(state)};
+    default:
+      return state
   }
 }
 

@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux';
+import {getAssignedSummary} from './actions/summary';
 
 import AppBar from 'material-ui/AppBar';
 import Paper from 'material-ui/Paper';
@@ -8,6 +9,11 @@ import SummaryAssignee from './components/SummaryAssignee';
 import './css/main.css'
 
 class App extends Component {
+
+	componentWillMount(){
+		this.props.getSummary()
+	}
+
 	render() {
 		return (
 			<div className="App">
@@ -24,15 +30,26 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
+	console.log('loggin state')
 	console.log(state);
 	return {
-		issues : state.tickets.issues,
-		summary: state.summary
+		issues : state.tickets.sorted,
+		summary: state.summary.assignedSummary
 	}
 }
 
+const mapDispatchToProps = (dispatch) => {
+	return {
+		getSummary(){
+			console.log('dispatch assignedSummary()')
+			dispatch(getAssignedSummary())
+		}
+	} 
+}
+
 App = connect(
-	mapStateToProps
+	mapStateToProps,
+	mapDispatchToProps
 )(App)
 
 export default App;
