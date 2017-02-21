@@ -101,7 +101,7 @@ class IssuesTable extends Component {
 		<TableRow onMouseUp={()=>this.showSubtasks(issue.id)} style={style}key={issue.key} >
 			<TableRowColumn>{fields.issuetype.name}</TableRowColumn>
 			<TableRowColumn>{issue.key}</TableRowColumn>
-			<TableRowColumn>{fields.summary}</TableRowColumn>
+			<TableRowColumn title={fields.summary}>{fields.summary}</TableRowColumn>
 			<TableRowColumn>{this.getAssignee(fields)}</TableRowColumn>
 			<TableRowColumn>{fields.priority.name}</TableRowColumn>
 			<TableRowColumn>{fields.status.name}</TableRowColumn>
