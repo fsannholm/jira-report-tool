@@ -10,7 +10,7 @@ import './css/main.css'
 
 class App extends Component {
 
-	componentWillMount(){
+	componentDidMount(){
 		this.props.getSummary()
 	}
 
@@ -19,7 +19,7 @@ class App extends Component {
 			<div className="App">
 				<AppBar title="Jira report tool"/>
 				<Paper zDepth={1}>
-					<IssuesTable issues={this.props.issues}/>
+					<IssuesTable />
 				</Paper>
 				<Paper zDepth={1}>
 					<SummaryAssignee summary={this.props.summary}/>
@@ -30,8 +30,6 @@ class App extends Component {
 }
 
 const mapStateToProps = (state) => {
-	console.log('loggin state')
-	console.log(state);
 	return {
 		issues : state.tickets.sorted,
 		summary: state.summary.assignedSummary
@@ -41,7 +39,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
 	return {
 		getSummary(){
-			console.log('dispatch assignedSummary()')
 			dispatch(getAssignedSummary())
 		}
 	} 
