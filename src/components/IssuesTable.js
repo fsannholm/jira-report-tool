@@ -76,7 +76,6 @@ class IssuesTable extends Component {
 			stories: 0
 		};
 		this.props.issues.forEach((issue)=>{
-			console.log(issue)
 			if(issue.subtasks.length){
 				count.issues += issue.subtasks.length
 				count.stories++
@@ -100,7 +99,9 @@ class IssuesTable extends Component {
 		return (
 		<TableRow onMouseUp={()=>this.showSubtasks(issue.id)} style={style}key={issue.key} >
 			<TableRowColumn>{fields.issuetype.name}</TableRowColumn>
-			<TableRowColumn>{issue.key}</TableRowColumn>
+			<TableRowColumn>
+				<a target="_blank" href={`${process.env.REACT_APP_JIRA_URL}jira/browse/${issue.key}`}>{issue.key}</a>
+			</TableRowColumn>
 			<TableRowColumn title={fields.summary}>{fields.summary}</TableRowColumn>
 			<TableRowColumn>{this.getAssignee(fields)}</TableRowColumn>
 			<TableRowColumn>{fields.priority.name}</TableRowColumn>
