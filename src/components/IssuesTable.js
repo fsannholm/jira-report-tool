@@ -5,7 +5,6 @@ import {Table, TableBody, TableHeader, TableHeaderColumn, TableRow, TableRowColu
 import Checkbox from 'material-ui/Checkbox';
 import moment from 'moment';
 
-
 class IssuesTable extends Component {
 	constructor(props){
 		super(props)
@@ -45,7 +44,14 @@ class IssuesTable extends Component {
 			missingEstimateCount: 0
 		}
 		this.props.issues.forEach((issue)=>{
-			stats.totalEstimated += issue.fields.timeoriginalestimate || 0
+			stats.totalEstimated += issue.fields.timeoriginalestimate || 0;
+			if(issue.subtasks.length){
+				let sumSubtasks = 0;
+				issue.subtasks.forEach((subtask) =>{
+					sumSubtasks += subtask.fields.timeoriginalestimate || 0;
+				});
+			stats.totalEstimated += sumSubtasks;
+			}
 			if(issue.fields.timeoriginalestimate === 0 || issue.fields.timeoriginalestimate === null){
 				stats.missingEstimateCount++;
 			}
@@ -64,14 +70,35 @@ class IssuesTable extends Component {
 		}
 	}
 
-	showSubtasks(rowIndex){
-		let issueId = this.props.issues[rowIndex].id;
+	getIssueCount(){
+		let count = {
+			issues: 0,
+			stories: 0
+		};
+		this.props.issues.forEach((issue)=>{
+			console.log(issue)
+			if(issue.subtasks.length){
+				count.issues += issue.subtasks.length
+				count.stories++
+			} else count.issues++
+		});
+		return count;
+	}
+
+	showSubtasks(issueId){
 		this.props.openSubtasks(issueId);
 	}
 
 	issueRow (issue) {
+		let style = {};
 		let fields = issue.fields;
-		return (<TableRow key={issue.key} >
+		if(fields.issuetype.subtask){
+			style = {
+					'backgroundColor': 'rgb(124, 187, 195)'
+			}
+		}
+		return (
+		<TableRow onMouseUp={()=>this.showSubtasks(issue.id)} style={style}key={issue.key} >
 			<TableRowColumn>{fields.issuetype.name}</TableRowColumn>
 			<TableRowColumn>{issue.key}</TableRowColumn>
 			<TableRowColumn>{fields.summary}</TableRowColumn>
@@ -88,16 +115,24 @@ class IssuesTable extends Component {
 		let rows;
 		if(this.state.visible){
 			 rows = this.props.issues.map( (issue) =>{
-				return this.issueRow(issue);
+				let rowsArr = [this.issueRow(issue)]
+				if(issue.showSubtasks){
+					let subtaskRows = issue.subtasks.map( i =>{
+						return this.issueRow(i);
+					});
+					rowsArr = rowsArr.concat(subtaskRows);
+				}
+				return rowsArr;
 			 })
 		}
 		return(
 			<div>
-				<Table showCheckboxes={false} onCellClick={(rowIndex) => this.showSubtasks(rowIndex)}>
+				<Table showCheckboxes={false} >
 					<TableHeader displaySelectAll={false} adjustForCheckbox={false}>
 						<TableRow>
 							<TableHeaderColumn>
-								{`Löytyi ${this.props.issues.length} tehätvää`}
+								{`Yhteensä ${this.getIssueCount().issues} tehtävää
+								ja ${this.getIssueCount().stories} tarinaa`}
 							</TableHeaderColumn>
 							<TableHeaderColumn>
 								<Checkbox label="Piilota tehtävät"
@@ -139,8 +174,14 @@ const mapDispatchToProps = (dispatch) => {
 	}
 }
 
+const mapStateToProps = (state) =>{
+	return {
+		issues: state.tickets.sorted
+	}
+}
+
 IssuesTable = connect(
-	null,
+	mapStateToProps,
 	mapDispatchToProps
 )(IssuesTable);
 

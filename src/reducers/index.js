@@ -2,7 +2,11 @@ import { combineReducers } from 'redux';
 import issues from '../../mocks/issues.json';
 import cloneDeep from 'lodash.clonedeep'; 
 
-const initialState = issues;
+const initialState = {
+  issues: issues.issues,
+  subtasks: getSubTasks(issues), 
+  sorted: arrangeSubtasks(issues)
+};
 
 const initialSummaryState = {assignedSummary: []}
 
@@ -65,18 +69,32 @@ function arrangeSubtasks(state){
   return rtn;
 }
 
-function setSubtasksVisible(state, id){
-  console.log(state);
+function setSubtasksVisible(sorted, id){
+  return sorted.map((item) =>{
+    if(id === item.id){
+      return Object.assign({}, item, {
+        showSubtasks: !item.showSubtasks
+      })
+    }
+  })
 }
 
 function tickets(state = initialState, action){
   switch(action.type){
-    case 'SHOW_SUBTASKS':
-      setSubtasksVisible(state, action.id);
-      console.log(state);
-      return {...state, state};
+    case 'OPEN_SUBTASKS':
+      console.log('subtasks')
+      return Object.assign({}, state, {sorted: state.sorted.map((issue) =>{
+        if(issue.id === action.issueId){
+          return Object.assign({}, issue, {
+            showSubtasks: !issue.showSubtasks
+          })
+        }
+        return issue
+      })
+    });
     default:
-      return {issues: getTopLevelTasks(state), subtasks: getSubTasks(state), sorted: arrangeSubtasks(state)}
+      console.log('default')
+      return state
   }
 }
 
