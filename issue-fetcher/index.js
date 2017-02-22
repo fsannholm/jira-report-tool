@@ -1,10 +1,15 @@
 const request = require('request');
 const util = require('util');
 const fs = require('fs');
-const params = require('../params');
 const dotenv = require('dotenv');
 
 dotenv.load()
+
+const params = {
+	instance: process.env.REACT_APP_JIRA_URL,
+	user: process.env.REACT_APP_JIRA_USER,
+	pass: process.env.REACT_APP_JIRA_PASS
+}
 
 function getNewSession(params){
 	return new Promise(function(resolve, reject){
