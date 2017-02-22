@@ -100,7 +100,7 @@ class IssuesTable extends Component {
 		<TableRow onMouseUp={()=>this.showSubtasks(issue.id)} style={style}key={issue.key} >
 			<TableRowColumn>{fields.issuetype.name}</TableRowColumn>
 			<TableRowColumn>
-				<a target="_blank" href={`${process.env.REACT_APP_JIRA_URL}jira/browse/${issue.key}`}>{issue.key}</a>
+				<a target="_blank" href={`${process.env.REACT_APP_JIRA_URL}browse/${issue.key}`}>{issue.key}</a>
 			</TableRowColumn>
 			<TableRowColumn title={fields.summary}>{fields.summary}</TableRowColumn>
 			<TableRowColumn>{this.getAssignee(fields)}</TableRowColumn>
